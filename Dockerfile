@@ -1,22 +1,24 @@
-FROM node:20-alpine
+# Use Node.js 20 for building the React app
+FROM node:20 AS build
 
+# Set the working directory
 WORKDIR /app
 
+# Copy package files and install dependencies
 COPY package.json package-lock.json ./
-
 RUN npm install
 
+# Copy the entire app and build it
 COPY . .
-
 RUN npm run build
 
-# Use Nginx for serving the built app
+# Use Nginx to serve the built React app
 FROM nginx:alpine
 
-# Copy the built app from the previous stage
+# Copy the built files to Nginx's serving directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose the correct port
+# Expose port 80 for the web server
 EXPOSE 80
 
 # Start Nginx
